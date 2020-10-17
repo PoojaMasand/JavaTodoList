@@ -61,30 +61,35 @@ public class ToDoTaskList {
                     break;
 
                 case ADD:
-                    addTaskToList();
+                    putValidationAndAddTask();
                     askForReload();
                     break;
+
                 case SEARCH_BY_PROJECT:
                     sortList(true, false); // ProjectFlag = true, // DateFlag = false
                     askForReload();
                     break;
+
                 case SEARCH_BY_DATE:
                     sortList(false, true); // ProjectFlag = false, // DateFlag = true
                     askForReload();
                     break;
+
                 case EDIT:
                     sortList(true, false); // Display records for user to choose and update
-                    updateTask();
+                    putValidationAndUpdateTask();
                     askForReload();
                     break;
+
                 case COMPLETE:
                     sortList(true, false);
-                    completeTask();
+                    putValidationAndCompleteTask();
                     askForReload();
                     break;
+
                 case REMOVE:
                     sortList(true, false);
-                    removeTask();
+                    putValidationAndRemoveTask();
                     askForReload();
                     break;
                 case QUIT:
@@ -109,11 +114,11 @@ public class ToDoTaskList {
     }
 
     /**
-     * This method is used to add task to the arraylist
+     * This method is used to put validation for task details and add task to the arraylist
      * User is asked to enter task title, project name and due date
      */
 
-    private void addTaskToList() {
+    private void putValidationAndAddTask() {
         Scanner sc = new Scanner(System.in);
         String taskDescription;
         String projectName;
@@ -124,42 +129,95 @@ public class ToDoTaskList {
                 System.out.println("Enter Task Title");
                 taskDescription = sc.nextLine();
 
-                if (checkIfTaskEmpty(taskDescription))
+                if (validateTaskForAdd(taskDescription))
                     continue;
 
-                if (checkIfTaskExist(taskDescription)) {
-                    System.out.println("This Task title already exist.Give another title");
-                    System.out.println();
-                    continue;
-                }
                 System.out.println("Enter Project");
                 projectName = sc.nextLine();
 
-                if (projectName.isEmpty()) {
-                    System.out.println("Project cannot be empty");
-                    System.out.println();
+                if (validateProject(projectName))
                     continue;
-                }
-                System.out.println("Enter Date in format yyyy-mm-dd");
 
+                System.out.println("Enter Date in format yyyy-mm-dd");
                 taskDueDate = getCorrectDateFormat(sc);
 
-                // Creating a new object with details
-                Task taskManager = new Task(taskDescription.trim(), projectName, taskDueDate, PENDING);
-                tasklist.add(taskManager);
+                addTask(taskDescription, projectName, taskDueDate);  // Separating add method for unit testing
+
                 System.out.println();
                 System.out.println("Do you want to add more task.Type Y/N ");
                 String userAnswer = sc.nextLine();
                 isFinished = !userAnswer.equalsIgnoreCase("Y");
 
             }
-            System.out.println();
-            System.out.println("Task added Successfully");
 
         } catch (Exception e) {
             System.out.println("Error in adding Task " + e.getMessage());
             e.printStackTrace();
         }
+
+    }
+
+    /**
+     * This method is used to validate that user has not added empty project name
+     *
+     * @param projectName entered by the user
+     * @return true if project name is empty
+     */
+
+    public boolean validateProject(String projectName) {
+        boolean validationFailed = false;
+        if (projectName.isEmpty()) {
+            System.out.println("Project cannot be empty");
+            System.out.println();
+            validationFailed = true;
+        }
+        return validationFailed;
+    }
+
+    /**
+     * This method is used to validate that task entered is not empty or duplicate
+     *
+     * @param taskDescription entered by the user
+     * @return true if validation failed
+     */
+
+    public boolean validateTaskForAdd(String taskDescription) {
+        boolean validationFailed = false;
+
+        if (checkIfTaskEmpty(taskDescription))
+            validationFailed = true;
+        else if(checkIfTaskExist(taskDescription))
+        {
+            System.out.println("This Task title already exist.Give another title");
+            System.out.println();
+            validationFailed = true;
+        }
+
+        return validationFailed;
+    }
+
+    /**
+     * This method is used to add the task object with title, project name and due date to the tasklist
+     *
+     * @param taskDescription as entered by the user
+     * @param projectName     as entered by the user
+     * @param taskDueDate     as entered by the user
+     * @return true if add is successful
+     */
+
+    public boolean addTask(String taskDescription, String projectName, LocalDate taskDueDate) {
+        boolean taskSucessful;
+        try {
+            Task taskManager = new Task(taskDescription.trim(), projectName, taskDueDate, PENDING);
+            tasklist.add(taskManager);
+            System.out.println();
+            System.out.println("Task added Successfully");
+            taskSucessful = true;
+        } catch (Exception e) {
+            System.out.println("Error in adding Task " + e.getMessage());
+            taskSucessful = false;
+        }
+        return taskSucessful;
 
     }
 
@@ -189,15 +247,15 @@ public class ToDoTaskList {
     }
 
     /**
-     * This method is used to update task to the arraylist
+     * This method is used to put the validation and update task to the arraylist
      * User is asked to enter task title, project name and due date
      */
-    private void updateTask() {
+
+    private void putValidationAndUpdateTask() {
         Scanner sc = new Scanner(System.in);
         String taskDescription;
         String projectName;
         boolean isFinished = false;
-        boolean taskFound = false;
         LocalDate taskDueDate = LocalDate.now();
         try {
             System.out.println("Please enter the Task title which need to be Updated");
@@ -205,44 +263,79 @@ public class ToDoTaskList {
                 System.out.println("Enter Task Title");
                 taskDescription = sc.nextLine();
 
-                if (checkIfTaskEmpty(taskDescription))
+                if (validateTaskForEdit(taskDescription))
                     continue;
-
-                if (!checkIfTaskExist(taskDescription)) {
-                    System.out.println("This task does not exist");
-                    continue;
-                }
 
                 System.out.println("Enter Project");
                 projectName = sc.nextLine();
-                if (projectName.isEmpty()) {
-                    System.out.println("Project cannot be empty");
+
+                if (validateProject(projectName))
                     continue;
-                }
 
                 System.out.println("Enter Date in format yyyy-mm-dd");
                 taskDueDate = getCorrectDateFormat(sc);
 
-                Iterator<Task> iterator = tasklist.iterator();
-                while (iterator.hasNext()) {
-                    Task taskManager = iterator.next();
-                    if (taskManager.getDescription().equals(taskDescription)) {
-                        taskManager.setProject(projectName);
-                        taskManager.setTaskDueDate(taskDueDate);
-                        taskFound = true;
-                        break;
-                    }
-                }
+                updateTask(taskDescription, projectName, taskDueDate); // seperating update method for unit testing
+
                 System.out.println("Do you want to update more tasks.Type Y/N ");
                 String userAnswer = sc.nextLine();
                 isFinished = !userAnswer.equalsIgnoreCase("Y");
             }
-            System.out.println();
-            System.out.println("Updation of Task Successful");
+
         } catch (Exception e) {
             System.out.println("Error in updation " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This method is used to validate that task is not empty and its already there in the tasklist
+     *
+     * @param taskDescription as entered by the user
+     * @return true
+     */
+    private boolean validateTaskForEdit(String taskDescription) {
+        boolean validationFailed = false;
+
+        if (checkIfTaskEmpty(taskDescription)) {
+            validationFailed = true;
+        }
+        else if(!checkIfTaskExist(taskDescription)) {
+            System.out.println("This task does not exist");
+            validationFailed = true;
+        }
+
+        return validationFailed;
+    }
+
+    /**
+     * This method is used to update the Task object and add it back to the list
+     *
+     * @param taskDescription as entered by the user
+     * @param projectName     as entered by the user
+     * @param taskDueDate     as entered by the user
+     * @return true if updation is successful
+     */
+
+
+    public boolean updateTask(String taskDescription, String projectName, LocalDate taskDueDate) {
+        boolean taskSuccessful;
+        try {
+            for (Task taskManager : tasklist) {
+                if (taskManager.getDescription().equals(taskDescription)) {
+                    taskManager.setProject(projectName);
+                    taskManager.setTaskDueDate(taskDueDate);
+                    break;
+                }
+            }
+            System.out.println();
+            System.out.println("Updation of Task Successful");
+            taskSuccessful = true;
+        } catch (Exception e) {
+            System.out.println("Error in updating Task" + e.getMessage());
+            taskSuccessful = false;
+        }
+        return taskSuccessful;
     }
 
     /**
@@ -251,13 +344,14 @@ public class ToDoTaskList {
      * @param taskDescription, the title of the task entered by the user
      * @return true if task exist
      */
-    private boolean checkIfTaskExist(String taskDescription) {
+    public boolean checkIfTaskExist(String taskDescription) {
         Iterator<Task> iterator = tasklist.iterator();
         boolean taskFound = false;
+
+
         while (iterator.hasNext()) {
             Task taskManager = iterator.next();
             if (taskManager.getDescription().equals(taskDescription)) {
-                System.out.println("Entered Here");
                 taskFound = true;
                 break;
             }
@@ -281,45 +375,29 @@ public class ToDoTaskList {
     }
 
     /**
-     * This method is used to remove task from the arraylist
+     * This method is used to validate the task and remove it from the arraylist
      * User is asked to enter task title
      */
-    private void removeTask() {
+    private void putValidationAndRemoveTask() {
         Scanner sc = new Scanner(System.in);
         String taskDescription;
         boolean isFinished = false;
-        boolean taskFound = false;
         try {
             System.out.println("Please enter the Task title which need to be removed");
             while (!isFinished) {
                 System.out.println("Enter Task Title");
                 taskDescription = sc.nextLine();
 
-                if (checkIfTaskEmpty(taskDescription))
+                if (validateTaskForEdit(taskDescription))
                     continue;
 
-                if (!checkIfTaskExist(taskDescription)) {
-                    System.out.println("This task does not exist");
-                    continue;
-                }
-
-                Iterator<Task> iterator = tasklist.iterator();
-                while (iterator.hasNext()) {
-                    Task taskManager = iterator.next();
-                    if (taskManager.getDescription().equals(taskDescription)) {
-                        iterator.remove();
-                        taskFound = true;
-                        break;
-                    }
-                }
+                removeTask(taskDescription); // separating remove functionality for unit testing
 
                 System.out.println("Do you want to remove more tasks.Type Y/N ");
                 String userAnswer = sc.nextLine();
                 isFinished = !userAnswer.equalsIgnoreCase("Y");
             }
-            System.out.println();
 
-            System.out.println("Removal of task Successful");
         } catch (Exception e) {
             System.out.println("Error in removing the Task " + e.getMessage());
             e.printStackTrace();
@@ -327,10 +405,37 @@ public class ToDoTaskList {
     }
 
     /**
-     * This method is used to remove task from the arraylist
+     * This method is used to remove the task from the tasklist
+     *
+     * @param taskDescription as entered by the user
+     * @return true if removal is successful
+     */
+    public boolean removeTask(String taskDescription) {
+        boolean taskSuccessful;
+        try {
+            Iterator<Task> iterator = tasklist.iterator();
+            while (iterator.hasNext()) {
+                Task taskManager = iterator.next();
+                if (taskManager.getDescription().equals(taskDescription)) {
+                    iterator.remove();
+                    break;
+                }
+            }
+            taskSuccessful = true;
+            System.out.println();
+            System.out.println("Removal of task Successful");
+        } catch (Exception e) {
+            System.out.println("Error in removing the task " + e.getMessage());
+            taskSuccessful = false;
+        }
+        return taskSuccessful;
+    }
+
+    /**
+     * This method is used to put the validation and complete the status to complete
      * User is asked to enter task title
      */
-    private void completeTask() {
+    private void putValidationAndCompleteTask() {
         Scanner sc = new Scanner(System.in);
         String taskDescription;
         boolean isFinished = false;
@@ -340,35 +445,40 @@ public class ToDoTaskList {
                 System.out.println("Enter Task Title");
                 taskDescription = sc.nextLine();
 
-                if (checkIfTaskEmpty(taskDescription))
+                if (validateTaskForEdit(taskDescription))
                     continue;
 
-                if (!checkIfTaskExist(taskDescription)) {
-                    System.out.println("This task does not exist");
-                    continue;
-                }
-
-                Iterator<Task> iterator = tasklist.iterator();
-                while (iterator.hasNext()) {
-                    Task taskManager = iterator.next();
-                    if (taskManager.getDescription().equals(taskDescription)) {
-                        System.out.println("Entered Here");
-                        taskManager.setStatus(COMPLETE);
-                        break;
-                    }
-                }
+                completeTask(taskDescription);
 
                 System.out.println("Do you want to complete more tasks.Type Y/N ");
                 String userAnswer = sc.nextLine();
                 isFinished = !userAnswer.equalsIgnoreCase("Y");
             }
-            System.out.println();
-            System.out.println("Completion of Task Successful");
+
         } catch (Exception e) {
             System.out.println("Error in Completing the Task " + e.getMessage());
             e.printStackTrace();
 
         }
+    }
+
+    public boolean completeTask(String taskDescription)  {
+        boolean taskSuccessful;
+        try {
+            for (Task taskManager : tasklist) {
+                if (taskManager.getDescription().equals(taskDescription)) {
+                    taskManager.setStatus(COMPLETE);
+                    break;
+                }
+            }
+            System.out.println();
+            System.out.println("Completion of Task Successful");
+            taskSuccessful = true;
+        } catch (Exception e) {
+            System.out.println("Error in completing the task " + e.getMessage());
+            taskSuccessful = false;
+        }
+        return taskSuccessful;
     }
 
     /**
@@ -400,12 +510,11 @@ public class ToDoTaskList {
         System.out.println();
         System.out.println("-----------------------------------------------------------------------------------------");
 
-        for (Task str : tasklist) {
+        tasklist.forEach(str -> {
             System.out.format("%20s %20s %20s %10s",
                     str.getDescription(), str.getProject(), str.getTaskDueDate(), str.getStatus());
             System.out.println();
-
-        }
+        });
         System.out.println("-----------------------------------------------------------------------------------------");
     }
 

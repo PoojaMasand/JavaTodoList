@@ -21,9 +21,6 @@ public class Task implements Serializable {
     private LocalDate taskDueDate;
     private String status;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public void setProject(String project) {
         this.project = project;

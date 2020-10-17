@@ -1,5 +1,6 @@
 package com.project;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -21,10 +22,8 @@ public class CommandWords {
      */
     public CommandWords() {
         validCommands = new HashMap<>();
-        for (CommandWord command : CommandWord.values()) {
-            validCommands.put(command.getUserValue(), command);
-
-        }
+        Arrays.stream(CommandWord.values())
+                .forEachOrdered(command -> validCommands.put(command.getUserValue(), command));
     }
 
     /**

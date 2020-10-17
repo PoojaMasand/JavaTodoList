@@ -12,7 +12,7 @@ class TaskTest {
     void setProject() {
         Task taskManager =
                 new Task("Go for Holiday","Family",
-                        LocalDate.now(),"PENDING");
+                        LocalDate.now(),"Pending");
         assertEquals("Family",taskManager.getProject());
     }
 

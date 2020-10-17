@@ -50,7 +50,6 @@ public class FileHandler {
 
             // writes objects to output stream
             output.writeObject(taskList);
-
             output.close();
             file.close();
 
