@@ -50,7 +50,7 @@ Requires User to enter task title which need to be removed.
 
 ## Contact
 
-https://github.com/PoojaMasand/ToDoList.git
+https://github.com/PoojaMasand/JavaTodoList.git
 
 
 ## License
