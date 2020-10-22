@@ -48,9 +48,18 @@ Requires User to enter task title which need to be removed.
 * Gradle
 * JUnit
 
+## Installation Details
+
+* Install JDK (version 11 or above)
+* Check out the project source code from github : git clone https://github.com/PoojaMasand/JavaTodoList.git
+* Open a terminal and run the following command  : gradle install
+* Do gradle run to build and run this project
+
 ## Contact
 
 https://github.com/PoojaMasand/JavaTodoList.git
+
+Email Id : pmasand18@gmail.com
 
 
 ## License

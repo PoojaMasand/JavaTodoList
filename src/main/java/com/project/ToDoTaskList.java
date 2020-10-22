@@ -236,8 +236,12 @@ public class ToDoTaskList {
             try {
                 String date = sc.nextLine();
                 taskDueDate = LocalDate.parse(date, formatter);
-                notAValidDate = false;
-
+                if(taskDueDate.compareTo(LocalDate.now()) >= 0) {
+                    notAValidDate = false;
+                }
+                else {
+                    System.out.println("Past Due Date not allowed.Enter Valid Date");
+                }
             } catch (DateTimeParseException e) {
                 System.out.println("Please enter a valid date format");
                 System.out.println();
@@ -365,7 +369,7 @@ public class ToDoTaskList {
      * @param taskDescription, the task title entered by the user
      * @return true if task is empty
      */
-    private boolean checkIfTaskEmpty(String taskDescription) {
+    public boolean checkIfTaskEmpty(String taskDescription) {
         boolean isEmpty = false;
         if (taskDescription.isEmpty()) {
             System.out.println("Task cannot be empty");

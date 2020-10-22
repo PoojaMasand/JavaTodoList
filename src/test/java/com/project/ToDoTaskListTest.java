@@ -8,10 +8,17 @@ import java.time.LocalDate;
 class ToDoTaskListTest {
 
     @Test
-    void validateProject() {
+    void checkIfProjectEmpty() {
         ToDoTaskList todoList = new ToDoTaskList();
         boolean validationFailed = todoList.validateProject("");
-        assertEquals(true,validationFailed);
+        assertTrue(validationFailed);
+    }
+
+    @Test
+    void checkIfTaskEmpty() {
+        ToDoTaskList todoList = new ToDoTaskList();
+        boolean validationFailed = todoList.checkIfTaskEmpty("");
+        assertTrue(validationFailed);
     }
 
     @Test
@@ -19,14 +26,14 @@ class ToDoTaskListTest {
         ToDoTaskList todoList = new ToDoTaskList();
         todoList.addTask("Read Book","Education",LocalDate.now());
         boolean validationFailed = todoList.validateTaskForAdd("Read Book");
-        assertEquals(true,validationFailed);
+        assertTrue(validationFailed);
     }
 
     @Test
     void addTask() {
         ToDoTaskList todoList = new ToDoTaskList();
         boolean isSuccessful = todoList.addTask("Read Book","Education",LocalDate.now());
-        assertEquals(true,isSuccessful);
+        assertTrue(isSuccessful);
     }
 
     @Test
@@ -34,7 +41,7 @@ class ToDoTaskListTest {
         ToDoTaskList todoList = new ToDoTaskList();
         todoList.addTask("Read Book","Education",LocalDate.now());
         boolean isSuccessful = todoList.updateTask("Read Book","Hobby",LocalDate.now());
-        assertEquals(true,isSuccessful);
+        assertTrue(isSuccessful);
     }
 
     @Test
@@ -42,7 +49,7 @@ class ToDoTaskListTest {
         ToDoTaskList todoList = new ToDoTaskList();
         todoList.addTask("Read Book","Education",LocalDate.now());
         todoList.removeTask("Read Book");
-        assertEquals(false,todoList.checkIfTaskExist("Read Book"));
+        assertFalse(todoList.checkIfTaskExist("Read Book"));
     }
 
     @Test
